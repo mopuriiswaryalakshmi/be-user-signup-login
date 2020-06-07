@@ -11,10 +11,6 @@ const { userValidatorFor } = require("../validations/users");
 
 router
   .get("/users", getUser)
-  .put(
-    "/users/:id([a-z0-9]{24})",
-    userValidatorFor(updateUser.name),
-    updateUser
-  );
+  .put("/users", userValidatorFor(updateUser.name), updateUser);
 
 module.exports = router;

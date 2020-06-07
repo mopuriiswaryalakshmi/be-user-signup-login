@@ -22,12 +22,6 @@ const UserSchema = new Schema({
     type: String,
     required: true
   },
-  // address: [
-  //   {
-  //     type: String,
-  //     required: true
-  //   }
-  // ],
   address: {
     type: String,
     required: false
@@ -53,18 +47,3 @@ const UserSchema = new Schema({
 const User = mongoose.model("User", UserSchema, "users");
 
 module.exports = User;
-
-// orderLineItems: [
-//   {
-//       product: {
-//           type: Schema.Types.ObjectId,
-//           ref: 'Product'
-//       },
-//       quantity: {
-//           type: Number
-//       },
-//       price: {
-//           type: Number
-//       }
-//   }
-// ]

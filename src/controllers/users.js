@@ -7,9 +7,10 @@ const { ObjectId } = require("mongoose").Types;
 const getUser = (request, response) => {
   User.find()
     .then(users => {
-      // const userToSend = JSON.parse(JSON.stringify(users));
-      // delete userToSend.hash;
-      // delete userToSend.salt;
+      const childLogger = request.logger.child({
+        controllerName: "getUser"
+      });
+      childLogger.info({ req: request });
       return response.status(201).json({
         status: true,
         data: users
@@ -27,8 +28,12 @@ const getUser = (request, response) => {
 };
 
 const updateUser = (request, response) => {
+  const childLogger = request.logger.child({
+    controllerName: "updateUser"
+  });
+  childLogger.info({ req: request });
   const queryCriteria = {
-    _id: ObjectId(request.params.id)
+    _id: ObjectId(request.user.id)
   };
   User.findOne(queryCriteria)
     .then(user => {

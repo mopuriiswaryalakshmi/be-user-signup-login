@@ -8,6 +8,7 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const expressJWT = require("express-jwt");
 const swaggerUi = require("swagger-ui-express");
+var bodyParser = require("body-parser");
 // const passport = require("passport");
 
 // const initializePassport = require("./passport.config");
@@ -27,6 +28,7 @@ const makeDatabaseConnection = require("./src/connections/db-connections");
  */
 const userRouter = require("./src/routes/users");
 const authRouter = require("./src/routes/authentication");
+const uploadImageRouter = require("./src/routes/image-upload");
 
 /*
  * Import configuration here;
@@ -55,10 +57,9 @@ makeDatabaseConnection()
 
     const app = express();
     app.set("PORT", process.env.LOCALHOST_PORT);
-
-    app.use(express.json());
+    app.use(cors({ origin: "*" }));
+    app.use(bodyParser.json({ limit: "50mb", extended: true }));
     app.use(express.urlencoded({ extended: false }));
-    app.use(cors());
 
     app.use(express.static("public"));
 
@@ -82,13 +83,15 @@ makeDatabaseConnection()
         path: [
           `${basePath}/${apiVersion}/signup`,
           `${basePath}/${apiVersion}/login`,
-          `${basePath}/${apiVersion}/hello`
+          `${basePath}/${apiVersion}/hello`,
+          `${basePath}/${apiVersion}/upload`
         ]
       })
     );
 
     app.use(`${basePath}/${apiVersion}`, userRouter);
     app.use(`${basePath}/${apiVersion}`, authRouter);
+    app.use(`${basePath}/${apiVersion}`, uploadImageRouter);
 
     app.get(`${basePath}/${apiVersion}/hello`, (request, response) => {
       response.send("hello");

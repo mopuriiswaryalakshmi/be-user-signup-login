@@ -110,7 +110,6 @@ const login = (request, response) => {
         {
           id: user._id,
           email: user.email
-          // role: user.role
         },
         secret
       );
