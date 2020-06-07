@@ -9,14 +9,6 @@ const cors = require("cors");
 const expressJWT = require("express-jwt");
 const swaggerUi = require("swagger-ui-express");
 var bodyParser = require("body-parser");
-// const passport = require("passport");
-
-// const initializePassport = require("./passport.config");
-// initializePassport(passport);
-/*
- *  Import project packages here;
- */
-// const swaggerDocument = require("./docs/api/openapi");
 
 /*
  * Import database modules here;
@@ -28,13 +20,12 @@ const makeDatabaseConnection = require("./src/connections/db-connections");
  */
 const userRouter = require("./src/routes/users");
 const authRouter = require("./src/routes/authentication");
-const uploadImageRouter = require("./src/routes/image-upload");
 
 /*
  * Import configuration here;
  */
 const {
-  apiPathDetails: { apiVersion, basePath }
+  apiPathDetails: { apiVersion, basePath },
 } = require("./config");
 
 /*
@@ -70,28 +61,18 @@ makeDatabaseConnection()
       next();
     });
 
-    // app.get("/", (req, res) => {
-    //   res.render("index.ejs");
-    // });
-
-    // app.get("/login", (req, res) => {
-    //   res.render("login.ejs");
-    // });
-
     app.use(
       expressJWT({ secret: "secret" }).unless({
         path: [
           `${basePath}/${apiVersion}/signup`,
           `${basePath}/${apiVersion}/login`,
           `${basePath}/${apiVersion}/hello`,
-          `${basePath}/${apiVersion}/upload`
-        ]
+        ],
       })
     );
 
     app.use(`${basePath}/${apiVersion}`, userRouter);
     app.use(`${basePath}/${apiVersion}`, authRouter);
-    app.use(`${basePath}/${apiVersion}`, uploadImageRouter);
 
     app.get(`${basePath}/${apiVersion}/hello`, (request, response) => {
       response.send("hello");
@@ -105,8 +86,8 @@ makeDatabaseConnection()
           status: false,
           error: {
             error: "Generic Error",
-            message: error
-          }
+            message: error,
+          },
         });
       }
 
@@ -115,8 +96,8 @@ makeDatabaseConnection()
           status: false,
           error: {
             error: "Forbidden Error",
-            message: "You don't have enough permisssion to access the API."
-          }
+            message: "You don't have enough permisssion to access the API.",
+          },
         });
       }
 
@@ -126,8 +107,8 @@ makeDatabaseConnection()
           status: false,
           error: {
             error: error.name,
-            message: "Invalid Token."
-          }
+            message: "Invalid Token.",
+          },
         });
       }
 
@@ -136,8 +117,8 @@ makeDatabaseConnection()
         status: false,
         error: {
           error: error.name,
-          message: error.message
-        }
+          message: error.message,
+        },
       });
     });
 

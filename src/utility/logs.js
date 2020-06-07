@@ -16,7 +16,7 @@ const requestSerializer = req => ({
   url: req.url,
   // headers: req.headers,
   query: req.query,
-  body: req.body
+  body: req.body,
 });
 
 const getLogger = () => {
@@ -27,68 +27,27 @@ const getLogger = () => {
     name: "Users Backend",
     serializers: {
       req: requestSerializer,
-      err: bunyan.stdSerializers.err
+      err: bunyan.stdSerializers.err,
     },
     src: true,
     streams: [
       {
         level: "debug",
-        stream: process.stdout
+        stream: process.stdout,
       },
 
       {
         level: process.env.NODE_ENV === "local" ? "debug" : "info",
         type: "rotating-file",
-        path:
-          `${process.env.LOGS_LOCATION}/${process.env.LOGS_FILE_NAME}` ||
-          "./logs/matching_engine_be.log",
+        path: `${process.env.LOGS_LOCATION}/${process.env.LOGS_FILE_NAME}` || "./logs/be_users.log",
         period: process.env.LOGS_ROTATATION_PERIOD || "7d",
-        count: parseInt(process.env.LOGS_ROTATATION_COPIES, 10) || 2
-      }
-    ]
+        count: parseInt(process.env.LOGS_ROTATATION_COPIES, 10) || 2,
+      },
+    ],
   });
   return logger;
 };
 
-const fileLogger = bunyan.createLogger({
-  name: "Users Backend",
-  src: true,
-  streams: [
-    {
-      level: "debug",
-      stream: process.stdout
-    },
-
-    {
-      level: process.env.NODE_ENV === "local" ? "debug" : "info",
-      type: "rotating-file",
-      path:
-        `${process.env.LOGS_LOCATION}/${process.env.LOGS_FILE_NAME}` ||
-        "./logs/matching_engine_be.log",
-      period: process.env.LOGS_ROTATATION_PERIOD || "7d",
-      count: parseInt(process.env.LOGS_ROTATATION_COPIES, 10) || 2
-    }
-  ]
-});
-
-const handleEnvLogData = (env, loggerName, message, data, traceId) => {
-  try {
-    if (process.env.NODE_ENV == env) {
-      return loggerName.debug({
-        message: message,
-        data: data,
-        traceId: traceId
-      });
-    } else {
-      console.log("Outside ENV");
-    }
-  } catch (err) {
-    return loggerName.error({ data: err, message: message, traceId: traceId });
-  }
-};
-
 module.exports = {
   getLogger,
-  fileLogger,
-  handleEnvLogData
 };
