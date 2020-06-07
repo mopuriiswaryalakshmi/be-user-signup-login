@@ -8,7 +8,7 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const expressJWT = require("express-jwt");
 const swaggerUi = require("swagger-ui-express");
-var bodyParser = require("body-parser");
+const bodyParser = require("body-parser");
 
 /*
  * Import database modules here;
@@ -20,6 +20,7 @@ const makeDatabaseConnection = require("./src/connections/db-connections");
  */
 const userRouter = require("./src/routes/users");
 const authRouter = require("./src/routes/authentication");
+const swaggerDocument = require("./docs/api/openapi");
 
 /*
  * Import configuration here;
@@ -33,7 +34,7 @@ const {
  */
 const { getLogger } = require("./src/utility/logs");
 
-process.on("exit", code => {
+process.on("exit", (code) => {
   // eslint-disable-next-line no-console
   console.log(`Exiting with code ${code}`);
   mongoose.disconnect();
@@ -42,7 +43,7 @@ process.on("exit", code => {
 // eslint-disable-next-line no-unused-vars
 makeDatabaseConnection()
   // eslint-disable-next-line no-unused-vars
-  .then(connection => {
+  .then((connection) => {
     // eslint-disable-next-line no-console
     console.log("Connected to the database");
 
@@ -54,7 +55,7 @@ makeDatabaseConnection()
 
     app.use(express.static("public"));
 
-    // app.use("/swagger", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+    app.use("/swagger", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
     app.use((request, response, next) => {
       request.logger = getLogger();
@@ -67,6 +68,7 @@ makeDatabaseConnection()
           `${basePath}/${apiVersion}/signup`,
           `${basePath}/${apiVersion}/login`,
           `${basePath}/${apiVersion}/hello`,
+          `${basePath}/${apiVersion}/swagger`,
         ],
       })
     );
@@ -122,7 +124,7 @@ makeDatabaseConnection()
       });
     });
 
-    http.createServer(app).listen(app.get("PORT"), err => {
+    http.createServer(app).listen(app.get("PORT"), (err) => {
       if (err) {
         // eslint-disable-next-line no-console
         console.log(`Error while start up the server, ${err}`);
@@ -132,7 +134,7 @@ makeDatabaseConnection()
       console.log(`HTTP server running on ${app.get("PORT")}`);
     });
   })
-  .catch(error => {
+  .catch((error) => {
     // eslint-disable-next-line no-console
     console.log(error.message);
     process.exit(2);

@@ -11,14 +11,14 @@ const { updateUser } = require("../controllers/users");
 const updateUserValidator = (request, response, next) => {
   const updateUserSchema = Joi.object({
     name: Joi.string().max(20),
-    address: Joi.string().max(10),
+    address: Joi.string(),
     profilePicture: Joi.string(),
     gender: Joi.string(),
     maritalStatus: Joi.string(),
-    dateOfBirth: Joi.string()
+    dateOfBirth: Joi.string(),
   }).and("address", "profilePicture", "gender", "maritalStatus", "dateOfBirth");
   const { error } = updateUserSchema.validate(request.body, {
-    abortEarly: false
+    abortEarly: false,
   });
   if (error) {
     return response.status(400).json({
@@ -26,14 +26,14 @@ const updateUserValidator = (request, response, next) => {
       error: {
         error: "BadRequestError",
         message: "Request doesn't contain all the required fields.",
-        errors: error.details.map(detail => detail.message)
-      }
+        errors: error.details.map((detail) => detail.message),
+      },
     });
   }
   next();
 };
 
-const userValidatorFor = methodType => (request, response, next) => {
+const userValidatorFor = (methodType) => (request, response, next) => {
   switch (methodType) {
     case updateUser.name:
       updateUserValidator(request, response, next);
@@ -44,5 +44,5 @@ const userValidatorFor = methodType => (request, response, next) => {
 };
 
 module.exports = {
-  userValidatorFor
+  userValidatorFor,
 };

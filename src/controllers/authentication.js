@@ -12,23 +12,22 @@ const { secret } = require("../../config");
 
 const signUp = (request, response) => {
   const childLogger = request.logger.child({
-    controllerName: "createOrder"
-    // traceId: uniqid()
+    controllerName: "createOrder",
   });
   childLogger.info({ req: request });
   const { email, password, name } = request.body;
 
   User.findOne({
-    email
+    email,
   })
-    .then(result => {
+    .then((result) => {
       if (result) {
         return response.status(409).send({
           status: false,
           error: {
             name: "ConflictError",
-            message: `A user with the email "${email}" has already signed up.`
-          }
+            message: `A user with the email "${email}" has already signed up.`,
+          },
         });
       }
       const { hash, salt } = generateHashAndSalt(password);
@@ -37,47 +36,37 @@ const signUp = (request, response) => {
         email,
         name,
         hash,
-        salt
+        salt,
       });
 
       user
         .save()
-        .then(savedUser => {
-          const token = jwt.sign(
-            {
-              //  eslint-disable-next-line no-underscore-dangle
-              id: savedUser._id,
-              email: savedUser.email
-            },
-            secret
-          );
+        .then((savedUser) => {
+          const userToSend = JSON.parse(JSON.stringify(savedUser));
+          delete userToSend.hash;
+          delete userToSend.salt;
           return response.status(201).json({
             status: true,
-            data: {
-              //  eslint-disable-next-line no-underscore-dangle
-              id: savedUser._id,
-              email: savedUser.email,
-              token
-            }
+            data: userToSend,
           });
         })
-        .catch(error =>
+        .catch((error) =>
           response.status(500).json({
             status: false,
             error: {
               name: error.name,
-              message: error.message
-            }
+              message: error.message,
+            },
           })
         );
     })
-    .catch(error =>
+    .catch((error) =>
       response.status(500).json({
         status: false,
         error: {
           name: error.name,
-          message: error.message
-        }
+          message: error.message,
+        },
       })
     );
 };
@@ -85,16 +74,16 @@ const signUp = (request, response) => {
 const login = (request, response) => {
   const { email, password } = request.body;
   User.findOne({
-    email
+    email,
   })
-    .then(user => {
+    .then((user) => {
       if (!user) {
         return response.status(404).send({
           status: false,
           error: {
             name: "NotFoundError",
-            message: "User with the given email not found."
-          }
+            message: "User with the given email not found.",
+          },
         });
       }
       if (!isPasswordValid(user.salt, user.hash, password)) {
@@ -102,14 +91,14 @@ const login = (request, response) => {
           status: false,
           error: {
             name: "NotFoundError",
-            message: "Please check your password."
-          }
+            message: "Please check your password.",
+          },
         });
       }
       const token = jwt.sign(
         {
           id: user._id,
-          email: user.email
+          email: user.email,
         },
         secret
       );
@@ -118,24 +107,22 @@ const login = (request, response) => {
         data: {
           id: user._id,
           email: user.email,
-          name: user.name,
-          categorization: user.categorization,
-          token
-        }
+          token,
+        },
       });
     })
-    .catch(error => {
+    .catch((error) => {
       return response.status(500).send({
         status: false,
         error: {
           name: error.name,
-          message: error.message
-        }
+          message: error.message,
+        },
       });
     });
 };
 
 module.exports = {
   login,
-  signUp
+  signUp,
 };
